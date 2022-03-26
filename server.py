@@ -3,6 +3,7 @@ import logging
 import obshak
 import exceptions
 import vk_api
+import payments.payments as payments
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.keyboard import VkKeyboardButton
 from vk_api.utils import get_random_id, sjson_dumps
@@ -11,6 +12,7 @@ from vk_api.utils import get_random_id, sjson_dumps
 # GROUP_TOKEN = os.getenv("VK_GROUP_TOKEN")
 
 logging.basicConfig(level=logging.INFO)
+payments = payments.Payments()
 
 GROUP_ID = '211937698'
 GROUP_TOKEN = 'd71c0693eee4737b603bd4424ebd21b0cbd2280fcb5855b0cff5e62ca031dde1171d2563e727359a022ce'
@@ -29,37 +31,22 @@ def send_message(peer_id, keyboard=None, message=''):
         message=message
     )
 
-
-def add_custom_vkpay_keyboard():
-    custom_keyboard = sjson_dumps({
-        'one_time': False,
-        'inline': True,
-        'buttons': [[
-            {'action': {
-                'type': VkKeyboardButton.VKPAY.value,
-                'payload': None,
-                'hash': "action=pay-to-user&amount=333&user_id=340953279",
-            }}
-        ]]
-    })
-    return custom_keyboard
-
-
 def start_long_polling():
     for event in long_poll.listen():
-        # print(event.message.text)
         if event.type == VkBotEventType.MESSAGE_NEW:
-            """Обрабатываем обычное сообщение"""
+            print("New message to bot: " + event.message.text)
             peer_id = event.message.peer_id
+            send_message(peer_id, message=f'Мне прислали соообщение, пошел обрабатывать')
+
             try:
-                pass
                 test_data = obshak.process_message(event.message.text.__str__())
             except exceptions.NotCorrectMessage as e:
-                send_message(peer_id, add_custom_vkpay_keyboard(), 'Error')
-                return
-            send_message(peer_id, add_custom_vkpay_keyboard(),
-                         f'Добавлен долг  {obshak.test_answer}')
-
+                send_message(peer_id,message='Я не понял, соре(')
+            
+            # если запрашивается оплата, пуляем кнопку в сообщении
+            keyboard = payments.generate_VKpay_keyboard(100, payments.test_user_id)
+            send_message(peer_id, keyboard, f'Kнопка оплаты')
+            
 
 if __name__ == '__main__':
     start_long_polling()
