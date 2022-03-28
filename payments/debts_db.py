@@ -6,35 +6,47 @@ class DebtsDatabase():
     def __init__(self):
         db.check_db_exists()
 
-    def set_debt(self, creditor_id=None, debtor_id=None, amount=None, message_id=""):
-        db.insert(db.PAYMENTS_TABLE_NAME, {
-            "creditor_id": creditor_id,
-            "debtor_id": debtor_id,
-            "amount": amount,
-            "created": datetime.datetime.now(),
-            "message_id": message_id,
-            # add if list is extended
-        })
+    def set_debt(self, creditor_id=None, debtor_id=None, amount=None):
+        if (db.debts_search_by_users(creditor_id, debtor_id) == ()):
+            db.insert(db.PAYMENTS_TABLE_NAME, {
+                "creditor_id": creditor_id,
+                "debtor_id": debtor_id,
+                "amount": amount,
+                "created": datetime.datetime.now(),
+                # add if list is extended
+            })
+        else:
+            record = db.debts_search_by_users(creditor_id, debtor_id)
+            print(record)
+            print("OK! "+str(record))
+            db.debts_update_amount(id=record[0], amount=record[3]+amount)
+        
         
     # заплатить одному пользователю денежку
     def payoff_debt(self, creditor_id=None, debtor_id=None, amount=None, message_id=""):
-        # прочекать все ли ок
-        # записать в базу данных
-        # отправить сообщение (если бот может писать)
-        pass
+        print("Payment: Executing PAYOFF")
+        current_record = db.debts_search_by_users(creditor_id, debtor_id)
+        if (current_record == ()):
+            raise Exception("not found")
+        if (current_record[3] < amount):
+            raise Exception("Amount paied is more than needed")
+        db.debts_update_amount(id=current_record[0], amount=current_record[3]-amount)
 
     # получить список должников
     def get_debtors(self, user_id=None):
-        pass
+        print("Payment: Executing Get Debtors")
+        return db.debts_search_debtors_by_creditor(user_id)
 
     # получить список тех, кому должен
     def get_creditors(self, user_id=None):
-        pass
-
-    # узнать статус пользователя - сколько ты ему или он тебе должен + история операций
-    def get_all_debts_user(self, current_user_id=None, request_user_id=None):
-        #проверить задолженность конкретному пользователю
-        pass
+        print("Payment: Executing Get Creditors")
+        return db.debts_search_creditors_by_debtor(user_id)
 
     def check_all(self):
-        print(db.fetchall(db.PAYMENTS_TABLE_NAME, ["amount"]))
+        self.set_debt("000000", "000001", 400)
+        print(db.debts_get_info_by_id(1))
+        self.payoff_debt("000000", "000001", 300)
+        self.payoff_debt("000000", "000001", 0)
+        print(db.debts_get_info_by_id(1))
+        print(self.get_debtors("000000"))
+        print(self.get_creditors("000001"))

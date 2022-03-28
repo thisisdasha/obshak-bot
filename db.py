@@ -18,10 +18,53 @@ def insert(table: str, column_values: Dict):
         values)
     conn.commit()
 
+def debts_get_info_by_id(id: int):
+    cursor.execute(f'SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE id = {id} ')
+    rows = cursor.fetchall()
+    if (rows == []):
+        return ()
+    return rows[0]
+
+# if needed, we can do it flexible, but i am lazy(
+def debts_update_amount(id: int, amount: int):
+    print("SQL: Update amount of debt")
+    cursor.execute(f"UPDATE {PAYMENTS_TABLE_NAME} SET amount={amount} WHERE id={id}")
+    conn.commit()
+
+# -1 means no query
+def debts_search_by_users(creditor_id: str, debtor_id: str):
+    cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND debtor_id='{debtor_id}'")
+    print(f"SQL: Execute command: search")
+    ids = cursor.fetchall()
+    if ids == []:
+        print("SQL: Result: Not found record in db")
+        return ()
+    print(f"SQL: Result: Found id {ids[0][0]}")
+    return ids[0]
+
+def debts_search_debtors_by_creditor(creditor_id: str):
+    cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}'  AND amount>0")
+    print(f"SQL: Execute command: SELECT debtor_id FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND amount>0")
+    ids = cursor.fetchall()
+    if ids == []:
+        print("SQL: Result: Not found")
+        return []
+    print("SQL: Result: Found debtors")
+    return ids
+
+def debts_search_creditors_by_debtor(debtor_id: str):
+    cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE debtor_id ='{debtor_id}'  AND amount>0")
+    print(f"SQL: Execute command: SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE debtor_id ='{debtor_id}'  AND amount>0")
+    ids = cursor.fetchall()
+    if ids == []:
+        print("SQL: Result: Not found")
+        return []
+    print("SQL: Result: Found creditors")
+    return ids
 
 def fetchall(table: str, columns: List[str]) -> list[dict[str, Any]]:
     columns_joined = ", ".join(columns)
-    cursor.execute(f"SELECT {columns_joined} FROM {table}")
+    cursor.execute(f"SELECT {columns_joined} FROM {PAYMENTS_TABLE_NAME}")
     rows = cursor.fetchall()
     result = []
     for row in rows:
