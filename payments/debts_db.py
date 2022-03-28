@@ -1,3 +1,4 @@
+from re import L
 import db
 import datetime
 
@@ -11,14 +12,20 @@ class DebtsDatabase():
             db.insert(db.PAYMENTS_TABLE_NAME, {
                 "creditor_id": creditor_id,
                 "debtor_id": debtor_id,
-                "amount": amount,
+                "amount": 0,
                 "created": datetime.datetime.now(),
                 # add if list is extended
             })
+        record = db.debts_search_by_users(creditor_id, debtor_id)
+        record_other = db.debts_search_by_users(debtor_id, creditor_id)
+        if (record_other != () and record_other[3] > 0):
+            if (record_other[3] >= amount):
+                db.debts_update_amount(id=record_other[0], amount=record_other[3]-amount)
+            else:
+                db.debts_update_amount(id=record_other[0], amount=0)
+                amount -= record_other[3]
+                db.debts_update_amount(id=record[0], amount=record[3]+amount)
         else:
-            record = db.debts_search_by_users(creditor_id, debtor_id)
-            print(record)
-            print("OK! "+str(record))
             db.debts_update_amount(id=record[0], amount=record[3]+amount)
         
         
@@ -44,9 +51,14 @@ class DebtsDatabase():
 
     def check_all(self):
         self.set_debt("000000", "000001", 400)
+        self.set_debt("000000", "000001", 400)
+        self.set_debt("000000", "000001", 400)
+        self.set_debt("000001", "000000", 400)
+        print(db.debts_get_info_by_id(2))
         print(db.debts_get_info_by_id(1))
+        self.set_debt("000000", "000001", 400)
         self.payoff_debt("000000", "000001", 300)
         self.payoff_debt("000000", "000001", 0)
-        print(db.debts_get_info_by_id(1))
+        print(db.debts_get_info_by_id(1)[3] == 100)
         print(self.get_debtors("000000"))
         print(self.get_creditors("000001"))
