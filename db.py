@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Any
 
 DB_NAME="obshak.db"
 PAYMENTS_TABLE_NAME="obshak"
