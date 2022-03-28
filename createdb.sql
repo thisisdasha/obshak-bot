@@ -1,7 +1,8 @@
 create table obshak(
-    creditor_id integer primary key,
-    debtor_id integer key,
+    id integer primary key,
+    creditor_id text key,
+    debtor_id text key,
     amount integer,
     created datetime,
-    raw_text text
+    message_id integer
 );
