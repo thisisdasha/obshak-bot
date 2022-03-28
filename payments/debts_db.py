@@ -3,6 +3,7 @@ import db
 import datetime
 
 #тут методы работы с базой данных
+
 class DebtsDatabase():
     def __init__(self):
         db.check_db_exists()
@@ -30,7 +31,7 @@ class DebtsDatabase():
         
         
     # заплатить одному пользователю денежку
-    def payoff_debt(self, creditor_id=None, debtor_id=None, amount=None, message_id=""):
+    def payoff_debt(self, creditor_id=None, debtor_id=None, amount=None):
         print("Payment: Executing PAYOFF")
         current_record = db.debts_search_by_users(creditor_id, debtor_id)
         if (current_record == ()):
@@ -49,6 +50,7 @@ class DebtsDatabase():
         print("Payment: Executing Get Creditors")
         return db.debts_search_creditors_by_debtor(user_id)
 
+    # тесты
     def check_all(self):
         self.set_debt("000000", "000001", 400)
         self.set_debt("000000", "000001", 400)

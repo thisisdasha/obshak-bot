@@ -4,17 +4,14 @@ import obshak
 import exceptions
 import vk_api
 from payments.debts_db import DebtsDatabase
-import payments.payments as payments
+import payments.debts_db as payments
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_api.keyboard import VkKeyboardButton
 from vk_api.utils import get_random_id, sjson_dumps
 
 # GROUP_ID = os.getenv("VK_GROUP_ID")
 # GROUP_TOKEN = os.getenv("VK_GROUP_TOKEN")
 
 logging.basicConfig(level=logging.INFO)
-payments = payments.Payments()
-
 GROUP_ID = '211937698'
 GROUP_TOKEN = 'd71c0693eee4737b603bd4424ebd21b0cbd2280fcb5855b0cff5e62ca031dde1171d2563e727359a022ce'
 API_VERSION = "5.131"
