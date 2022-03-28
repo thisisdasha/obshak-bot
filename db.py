@@ -2,9 +2,10 @@ import os
 import sqlite3
 from typing import Dict, List, Tuple, Any
 
-conn = sqlite3.connect(os.path.join("db", "obshak.db"))
+DB_NAME="obshak.db"
+PAYMENTS_TABLE_NAME="obshak"
+conn = sqlite3.connect(os.path.join("db", DB_NAME))
 cursor = conn.cursor()
-
 
 def insert(table: str, column_values: Dict):
     columns = ', '.join(column_values.keys())
@@ -51,12 +52,11 @@ def _init_db():
 
 def check_db_exists():
     """Проверяет, инициализирована ли БД, если нет — инициализирует"""
-    cursor.execute("SELECT name FROM sqlite_master "
-                   "WHERE type='table' AND name='expense'")
+    cursor.execute(f"SELECT name FROM sqlite_master "
+                   "WHERE type='table' AND name='{PAYMENTS_TABLE_NAME}'")
     table_exists = cursor.fetchall()
-    if table_exists:
+    if table_exists == []:
+        print("Database is ready\n")
         return
     _init_db()
-
-
-check_db_exists()
+    print("Database is created and ready\n")

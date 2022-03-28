@@ -3,6 +3,7 @@ import logging
 import obshak
 import exceptions
 import vk_api
+from payments.debts_db import DebtsDatabase
 import payments.payments as payments
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.keyboard import VkKeyboardButton
@@ -21,6 +22,7 @@ API_VERSION = "5.131"
 vk_session = vk_api.VkApi(token=GROUP_TOKEN, api_version=API_VERSION)
 vk = vk_session.get_api()
 long_poll = VkBotLongPoll(vk_session, GROUP_ID)
+debts_db = DebtsDatabase()
 
 
 def send_message(peer_id, keyboard=None, message=''):
@@ -50,3 +52,4 @@ def start_long_polling():
 
 if __name__ == '__main__':
     start_long_polling()
+    

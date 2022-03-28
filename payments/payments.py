@@ -1,4 +1,4 @@
-import payments.payments_db
+import payments.debts_db
 from vk_api.keyboard import VkKeyboardButton
 from vk_api.utils import get_random_id, sjson_dumps
 
