@@ -3,6 +3,5 @@ create table obshak(
     creditor_id text key,
     debtor_id text key,
     amount integer,
-    created datetime,
-    message_id integer
+    created datetime DEFAULT CURRENT_TIMESTAMP
 );
