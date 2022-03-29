@@ -1,2 +1,5 @@
-# нужны тесты
-# Даша, организуй плез где пишем и как запускаем
+import pytest
+
+# test example
+def test_invalid_input():
+    assert "valid input" == "valid input"
