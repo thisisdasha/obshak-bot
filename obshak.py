@@ -1,38 +1,52 @@
-import re
-# import db
 import datetime
-from typing import List, NamedTuple, Optional
-
+import re
 import exceptions
+from model.debt_model import Debtor, Message
+from payments.debts_db import DebtsDatabase
+
+debts_db = DebtsDatabase()
 
 
-def process_message(raw_message):
-    _parse_message(raw_message)
-    return 'test_data'
+def add_debtor(cred_id, debt_id, amount, msg):
+    debts_db.add_debtor(Debtor(cred_id, debt_id, amount, datetime.datetime.now(), msg))
 
 
-def test_answer(message):
+def get_debtors():
     pass
 
 
-def _parse_message(raw_message):
+def get_creditors():
+    pass
+
+
+def pay():
+    pass
+
+
+def process_message(raw_message, creditor_id):
     """Парсит текст пришедшего сообщения о новом расходе."""
     print(raw_message)
-    # print(type(raw_message))
-    # try:
-    #     regexp_result = re.search(r"(\[id\d*)\|@\w+] (\d+) ", raw_message)
-    # except AttributeError:
-    #     print('test')
-    #     regexp_result = re.match(r"(\[id\d*)\|@\w+] (\d+) ", raw_message)
-    # print(regexp_result)
-    # print(regexp_result.group(1).strip().lower())
-
-    # if not regexp_result or not regexp_result.group(0) \
-    #         or not regexp_result.group(1) or not regexp_result.group(2):
-    #     raise exceptions.NotCorrectMessage(
-    #         "Не могу понять сообщение. Напишите сообщение в формате, "
-    #         "например:\n1500 метро")
-
-    # amount = regexp_result.group(1).replace(" ", "")
-    # category_text = regexp_result.group(2).strip().lower()
-    # return Message(amount=amount, category_text=category_text)
+    regexp_result = []
+    try:
+        # Регулярка выделяет id и сумму должника в сообщении.
+        regexp_result = re.findall(r"(\d*)\|@\w+] (\d+)", raw_message)
+    except AttributeError:
+        print('Я не понял, соре(')
+    if not regexp_result:
+        raise exceptions.NotCorrectMessage(
+            "Не могу понять сообщение. Напишите сообщение в формате, "
+            "например:\n1500 метро")
+    else:
+        people = []
+        amount = []
+        text2 = []
+        text = ''
+        for i in regexp_result:
+            text += 'ФИО:' + i[0] + ' Сумма:' + i[1] + '\n'
+            text2.append('ФИО:' + i[0] + ' Сумма:' + i[1] + '\n')
+            people.append(i[0])
+            amount.append(i[1])
+        print(people)
+        print()
+        print(amount)
+    return Message(creditor_id, people, amount, text, text2)
