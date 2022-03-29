@@ -2,10 +2,11 @@ import os
 import sqlite3
 from typing import Dict, List, Any
 
-DB_NAME="obshak.db"
-PAYMENTS_TABLE_NAME="obshak"
+DB_NAME = "obshak.db"
+PAYMENTS_TABLE_NAME = "obshak"
 conn = sqlite3.connect(os.path.join("db", DB_NAME))
 cursor = conn.cursor()
+
 
 def insert(table: str, column_values: Dict):
     columns = ', '.join(column_values.keys())
@@ -18,6 +19,7 @@ def insert(table: str, column_values: Dict):
         values)
     conn.commit()
 
+
 def debts_get_info_by_id(id: int):
     cursor.execute(f'SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE id = {id} ')
     rows = cursor.fetchall()
@@ -25,15 +27,18 @@ def debts_get_info_by_id(id: int):
         return ()
     return rows[0]
 
+
 # if needed, we can do it flexible, but i am lazy(
 def debts_update_amount(id: int, amount: int):
     print("SQL: Update amount of debt")
     cursor.execute(f"UPDATE {PAYMENTS_TABLE_NAME} SET amount={amount} WHERE id={id}")
     conn.commit()
 
+
 # -1 means no query
 def debts_search_by_users(creditor_id: str, debtor_id: str):
-    cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND debtor_id='{debtor_id}'")
+    cursor.execute(
+        f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND debtor_id='{debtor_id}'")
     print(f"SQL: Execute command: search")
     ids = cursor.fetchall()
     if ids == []:
@@ -42,15 +47,18 @@ def debts_search_by_users(creditor_id: str, debtor_id: str):
     print(f"SQL: Result: Found id {ids[0][0]}")
     return ids[0]
 
+
 def debts_search_debtors_by_creditor(creditor_id: str):
     cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}'  AND amount>0")
-    print(f"SQL: Execute command: SELECT debtor_id FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND amount>0")
+    print(
+        f"SQL: Execute command: SELECT debtor_id FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND amount>0")
     ids = cursor.fetchall()
     if ids == []:
         print("SQL: Result: Not found")
         return []
     print("SQL: Result: Found debtors")
     return ids
+
 
 def debts_search_creditors_by_debtor(debtor_id: str):
     cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE debtor_id ='{debtor_id}'  AND amount>0")
@@ -61,6 +69,7 @@ def debts_search_creditors_by_debtor(debtor_id: str):
         return []
     print("SQL: Result: Found creditors")
     return ids
+
 
 def fetchall(table: str, columns: List[str]) -> list[dict[str, Any]]:
     columns_joined = ", ".join(columns)
@@ -95,11 +104,24 @@ def _init_db():
 
 def check_db_exists():
     """Проверяет, инициализирована ли БД, если нет — инициализирует"""
-    cursor.execute(f"SELECT name FROM sqlite_master "
-                   "WHERE type='table' AND name='{PAYMENTS_TABLE_NAME}'")
+    try:
+        cursor.execute("SELECT creditor_id FROM obshak")
+    except:
+        _init_db()
+        print("Database is init\n")
     table_exists = cursor.fetchall()
-    if table_exists == []:
-        print("Database is ready\n")
+    if table_exists:
+        print("Database already exist\n")
         return
-    _init_db()
-    print("Database is created and ready\n")
+    # """Проверяет, инициализирована ли БД, если нет — инициализирует"""
+    # cursor.execute(f"SELECT name FROM sqlite_master "
+    #                "WHERE type='table' AND name='{PAYMENTS_TABLE_NAME}'")
+    # table_exists = cursor.fetchall()
+    # if table_exists == []:
+    #     print("Database is ready\n")
+    #     return
+    # _init_db()
+    # print("Database is created and ready\n")
+
+
+check_db_exists()

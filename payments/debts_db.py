@@ -1,35 +1,22 @@
-from re import L
 import db
 import datetime
 
-#тут методы работы с базой данных
+# Тут методы работы с базой данных
 
-class DebtsDatabase():
+
+class DebtsDatabase:
     def __init__(self):
         db.check_db_exists()
 
-    def set_debt(self, creditor_id=None, debtor_id=None, amount=None):
-        if (db.debts_search_by_users(creditor_id, debtor_id) == ()):
-            db.insert(db.PAYMENTS_TABLE_NAME, {
-                "creditor_id": creditor_id,
-                "debtor_id": debtor_id,
-                "amount": 0,
-                "created": datetime.datetime.now(),
-                # add if list is extended
-            })
-        record = db.debts_search_by_users(creditor_id, debtor_id)
-        record_other = db.debts_search_by_users(debtor_id, creditor_id)
-        if (record_other != () and record_other[3] > 0):
-            if (record_other[3] >= amount):
-                db.debts_update_amount(id=record_other[0], amount=record_other[3]-amount)
-            else:
-                db.debts_update_amount(id=record_other[0], amount=0)
-                amount -= record_other[3]
-                db.debts_update_amount(id=record[0], amount=record[3]+amount)
-        else:
-            db.debts_update_amount(id=record[0], amount=record[3]+amount)
-        
-        
+    def add_debtor(self, debtor):
+        db.insert("obshak", {
+            "creditor_id": debtor.cred_id,
+            "debtor_id": debtor.debt_id,
+            "amount": debtor.amount,
+            "created_time": debtor.date_time,
+            "raw_text": debtor.raw_text
+        })
+
     # заплатить одному пользователю денежку
     def payoff_debt(self, creditor_id=None, debtor_id=None, amount=None):
         print("Payment: Executing PAYOFF")
